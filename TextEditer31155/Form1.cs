@@ -23,6 +23,7 @@ namespace TextEditer31155
         //フォームのロード
         private void Form1_Load(object sender, EventArgs e)
         {
+
             FormName();
         }
         //ファイルの名前
@@ -40,7 +41,16 @@ namespace TextEditer31155
         //終了ボタン
         private void ExitXToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (rtTextArea.Text != "" )
+            {
+                Not_saved(sender,e);
+            }
+            else
+            {
+                Application.Exit();
+            }
             Application.Exit();
+
         }
         //名前を付けて保存
         private void SaveNameAToolStripMenuItem_Click(object sender, EventArgs e)
@@ -50,13 +60,20 @@ namespace TextEditer31155
                 using (StreamWriter sw = new StreamWriter(sFDSeveDeta.FileName, false, Encoding.GetEncoding("utf-8")))
                 {
                     sw.WriteLine(rtTextArea.Text);
+                    filename = sFDSeveDeta.FileName;
                 }
-                FormName();
+                
             }
+            FormName();
         }
         //開く
         private void OpenOToolStripMenuItem_Click(object sender, EventArgs e)
         {
+
+            if (rtTextArea.Text != "")
+            {
+                Not_saved(sender, e);
+            }
 
             if (oFDOpenDeta.ShowDialog() == DialogResult.OK)
             {
@@ -66,8 +83,9 @@ namespace TextEditer31155
                     filename = oFDOpenDeta.FileName;
                 }
             }
-            FormName();
-        }
+                FormName();
+            }
+        
         //上書き保存
         private void SaveSToolStripMenuItem_Click(object sender, EventArgs e)
         {  
@@ -77,6 +95,7 @@ namespace TextEditer31155
                 {
 
                     sw.WriteLine(rtTextArea.Text);
+                    filename = oFDOpenDeta.FileName;
                 }
                 else
                 {
@@ -84,6 +103,7 @@ namespace TextEditer31155
                 }
                 FormName();
             }
+            
         }
         //元に戻す
         private void UndoToolStripMenuItem_Click(object sender, EventArgs e)
@@ -122,6 +142,7 @@ namespace TextEditer31155
         {
             Mask_menu();
         }
+      
         private void Mask_menu()
         {
             if (rtTextArea.CanUndo)
@@ -179,10 +200,56 @@ namespace TextEditer31155
         //新規制作
         private void NewNToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if(rtTextArea.Text != "")
+            {
+                Not_saved(sender, e);
+            }
             rtTextArea.Text = "";
             this.filename = "";
         }
-       
+       //未保存
+       private void Not_saved(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show(
+                "ファイルを保存しますか？",
+                "質問",
+                MessageBoxButtons.YesNoCancel,
+                MessageBoxIcon.Exclamation,
+                MessageBoxDefaultButton.Button2);
+            if (result == DialogResult.Yes)
+            {
+                //「はい」が選択された時
+                if (filename == "")
+                {
+                    SaveNameAToolStripMenuItem_Click(sender, e);
+                }
+                else
+                {
+                    SaveSToolStripMenuItem_Click(sender, e);
+                }
+                
+            }
+            else if (result == DialogResult.No)
+            {
+                //「いいえ」が選択された時
+               
+            }
+            else if (result == DialogResult.Cancel)
+            {
+                //「キャンセル」が選択された時
+                this.Show();
+            }
+        }
+      
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (rtTextArea.Text != "")
+            {
+                Not_saved(sender, e);
+
+            }
+
+        }
     }
     
 }
